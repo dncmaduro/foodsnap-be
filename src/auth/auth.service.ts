@@ -44,7 +44,7 @@ export class AuthService {
     const { data: user, error: fetchError } = await this.supabaseService
       .getClient()
       .from('user')
-      .select('*')
+      .select('user_id, fullname, email, phonenumber, password')
       .eq('phonenumber', loginDto.phonenumber)
       .single();
 
@@ -57,7 +57,7 @@ export class AuthService {
     }
 
     const payload = {
-      sub: user.id,
+      user_id: user.user_id,
       email: user.email,
       phonenumber: user.phonenumber,
     };
@@ -74,7 +74,7 @@ export class AuthService {
 
     return {
       user: {
-        id: user.id,
+        id: user.user_id,
         fullname: user.fullname,
         email: user.email,
         phonenumber: user.phonenumber,
@@ -93,8 +93,8 @@ export class AuthService {
       const { data: user, error } = await this.supabaseService
         .getClient()
         .from('user')
-        .select('id, fullname, email, phonenumber')
-        .eq('id', payload.sub)
+        .select('user_id, fullname, email, phonenumber')
+        .eq('user_id', payload.user_id)
         .single();
 
       if (error || !user) {
@@ -102,7 +102,7 @@ export class AuthService {
       }
 
       const newPayload = {
-        sub: user.id,
+        user_id: user.user_id,
         email: user.email,
         phonenumber: user.phonenumber,
       };
