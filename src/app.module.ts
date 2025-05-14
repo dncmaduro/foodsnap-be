@@ -6,6 +6,7 @@ import { SupabaseModule } from './supabase/supabase.module';
 import { AuthModule } from './auth/auth.module';
 import { SearchModule } from './search/search.module';
 import { JwtStrategy } from './auth/strategies/jwt.strategy';
+import { RestaurantModule } from './restaurant/restaurant.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { JwtStrategy } from './auth/strategies/jwt.strategy';
     SupabaseModule,
     AuthModule,
     SearchModule,
+    RestaurantModule,
   ],
   controllers: [AppController],
   providers: [AppService, JwtStrategy],

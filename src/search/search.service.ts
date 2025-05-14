@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { SupabaseService } from '../supabase/supabase.service';
-import { Menuitem } from './interfaces/search.interface';
 
 @Injectable()
 export class SearchService {
