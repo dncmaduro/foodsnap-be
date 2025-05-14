@@ -8,20 +8,36 @@ export class RestaurantService {
   async getById(restaurantId: string): Promise<any> {
     const supabase = this.supabaseService.getClient();
 
-    const { data, error } = await supabase
+    // Get restaurant info
+    const { data: restaurant, error: restaurantError } = await supabase
       .from('restaurant')
       .select('*')
       .eq('restaurant_id', restaurantId)
-      .single(); // lấy 1 object thay vì array
+      .single();
 
-    if (error) {
-      throw error;
-    }
+    if (restaurantError) throw restaurantError;
+    if (!restaurant) throw new NotFoundException('Restaurant not found');
 
-    if (!data) {
-      throw new NotFoundException('Restaurant not found');
-    }
+    // Get menu items
+    const { data: menuItems, error: menuError } = await supabase
+      .from('menuitem')
+      .select('*')
+      .eq('restaurant_id', restaurantId);
 
-    return data;
+    if (menuError) throw menuError;
+
+    // Get reviews
+    const { data: reviews, error: reviewError } = await supabase
+      .from('review')
+      .select('*')
+      .eq('restaurant_id', restaurantId);
+
+    if (reviewError) throw reviewError;
+
+    return {
+      ...restaurant,
+      menuItems: menuItems || [],
+      reviews: reviews || [],
+    };
   }
 }
