@@ -17,8 +17,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     const { data: user, error } = await this.supabaseService
       .getClient()
       .from('user')
-      .select('id, fullname, email, phonenumber')
-      .eq('id', payload.sub)
+      .select('user_id, fullname, email, phonenumber')
+      .eq('email', payload.email)
       .single();
 
     if (error || !user) {
