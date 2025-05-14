@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: formflow-be
+        working-directory: foodsnap-be
 
     steps:
       - name: Checkout repository
