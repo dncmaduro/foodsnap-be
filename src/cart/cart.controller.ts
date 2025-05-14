@@ -48,4 +48,12 @@ export class CartController {
     const userId = req.user.user_id;
     return this.cartService.removeItem(userId, +cartItemId);
   }
+
+  @Delete()
+  @ApiOperation({ summary: 'Xoá toàn bộ giỏ hàng' })
+  @ApiResponse({ status: 200, description: 'Xoá thành công' })
+  async clearCart(@Req() req: any) {
+    const userId = req.user.user_id;
+    return this.cartService.clearCart(userId);
+  }
 }

@@ -84,4 +84,14 @@ export class CartService {
 
     return { message: 'Xoá khỏi giỏ hàng thành công' };
   }
+
+  async clearCart(userId: number) {
+    const supabase = this.supabaseService.getClient();
+
+    const { error } = await supabase.from('cart_item').delete().eq('user_id', userId);
+
+    if (error) throw new BadRequestException(error.message);
+
+    return { message: 'Đã xoá toàn bộ giỏ hàng' };
+  }
 }
