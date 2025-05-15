@@ -12,6 +12,8 @@ import { AddressModule } from './address/address.module';
 import { OrderModule } from './order/order.module';
 import { ReviewModule } from './review/review.module';
 import { RestaurantApplicationModule } from './restaurant-application/restaurant-application.module';
+import { ShipperApplicationModule } from './shipper-application/shipper-application.module';
+import { ShipperInfoModule } from './shipper/shipper.module';
 
 @Module({
   imports: [
@@ -27,6 +29,8 @@ import { RestaurantApplicationModule } from './restaurant-application/restaurant
     OrderModule,
     ReviewModule,
     RestaurantApplicationModule,
+    ShipperApplicationModule,
+    ShipperInfoModule,
   ],
   controllers: [AppController],
   providers: [AppService, JwtStrategy],
