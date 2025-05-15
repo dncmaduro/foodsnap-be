@@ -37,14 +37,22 @@ export class RestaurantController {
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('file')) // field name 'image' FE gửi lên
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Cập nhật thông tin nhà hàng của người dùng hiện tại' })
+  @ApiConsumes('multipart/form-data')
   @ApiResponse({ status: 200, description: 'Cập nhật thành công' })
   @ApiResponse({ status: 400, description: 'Lỗi dữ liệu' })
   @ApiResponse({ status: 404, description: 'Không tìm thấy nhà hàng' })
-  async updateRestaurant(@Req() req, @Param('id') id: string, @Body() dto: UpdateRestaurantDto) {
+  async updateRestaurant(
+    @Req() req,
+    @Param('id') id: string,
+    @Body() dto: UpdateRestaurantDto,
+    @UploadedFile() file?: Express.Multer.File, // file ảnh truyền lên FE
+  ) {
     const userId = req.user.user_id;
-    return this.restaurantService.updateInfo(userId, Number(id), dto);
+    // id là string, cast về số nếu bạn để DB là number, hoặc giữ string nếu là varchar
+    return this.restaurantService.updateRestaurantInfo(userId, id, dto, file);
   }
 
   @Get(':id/orders')
