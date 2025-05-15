@@ -8,6 +8,7 @@ import { SearchModule } from './search/search.module';
 import { JwtStrategy } from './auth/strategies/jwt.strategy';
 import { RestaurantModule } from './restaurant/restaurant.module';
 import { CartModule } from './cart/cart.module';
+import { AddressModule } from './address/address.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { CartModule } from './cart/cart.module';
     SearchModule,
     RestaurantModule,
     CartModule,
+    AddressModule,
   ],
   controllers: [AppController],
   providers: [AppService, JwtStrategy],
