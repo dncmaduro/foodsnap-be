@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { SupabaseService } from 'src/supabase/supabase.service';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { ShipperOrderStatus, UpdateShippingStatusDto } from './dto/update-order.dto';
 
 @Injectable()
 export class OrderService {
@@ -163,5 +164,88 @@ export class OrderService {
     if (updateError) throw new BadRequestException(updateError.message);
 
     return { message: 'Nhận đơn hàng thành công' };
+  }
+
+  async updateOrderShippingStatusByShipper(
+    orderId: number,
+    userId: number,
+    dto: UpdateShippingStatusDto,
+  ) {
+    const supabase = this.supabaseService.getClient();
+
+    const { status: newStatus } = dto;
+
+    // 1. Lấy đơn hàng
+    const { data: order, error: fetchError } = await supabase
+      .from('order')
+      .select('shipper_id, shipping_status')
+      .eq('order_id', orderId)
+      .single();
+
+    if (fetchError) throw new BadRequestException(fetchError.message);
+    if (!order) throw new NotFoundException('Không tìm thấy đơn hàng');
+
+    // 2. Kiểm tra quyền
+    if (order.shipper_id !== userId) {
+      throw new BadRequestException('Bạn không có quyền cập nhật đơn hàng này');
+    }
+
+    // 3. Kiểm tra transition hợp lệ
+    const allowedTransitions: Record<string, ShipperOrderStatus[]> = {
+      Assigned: [ShipperOrderStatus.InTransit],
+      [ShipperOrderStatus.InTransit]: [ShipperOrderStatus.Delivered, ShipperOrderStatus.Canceled],
+    };
+
+    const allowed = allowedTransitions[order.shipping_status] ?? [];
+    if (!allowed.includes(newStatus)) {
+      throw new BadRequestException('Không thể chuyển sang trạng thái này');
+    }
+
+    // 4. Cập nhật
+    const { error: updateError } = await supabase
+      .from('order')
+      .update({
+        shipping_status: newStatus,
+        delivered_at: newStatus === ShipperOrderStatus.Delivered ? new Date().toISOString() : null,
+      })
+      .eq('order_id', orderId);
+
+    if (updateError) throw new BadRequestException(updateError.message);
+
+    return { message: 'Cập nhật trạng thái đơn hàng thành công' };
+  }
+
+  async cancelOrderByUser(orderId: number, userId: number) {
+    const supabase = this.supabaseService.getClient();
+
+    // 1. Lấy đơn hàng và kiểm tra quyền
+    const { data: order, error } = await supabase
+      .from('order')
+      .select('user_id, shipping_status')
+      .eq('order_id', orderId)
+      .single();
+
+    if (error) throw new BadRequestException(error.message);
+    if (!order) throw new NotFoundException('Không tìm thấy đơn hàng');
+
+    if (order.user_id !== userId) {
+      throw new BadRequestException('Bạn không có quyền huỷ đơn hàng này');
+    }
+
+    if (order.shipping_status !== 'Pending') {
+      throw new BadRequestException('Chỉ có thể huỷ đơn khi đang ở trạng thái chờ xử lý');
+    }
+
+    // 2. Cập nhật trạng thái
+    const { error: updateError } = await supabase
+      .from('order')
+      .update({
+        shipping_status: 'Canceled',
+      })
+      .eq('order_id', orderId);
+
+    if (updateError) throw new BadRequestException(updateError.message);
+
+    return { message: 'Huỷ đơn hàng thành công' };
   }
 }

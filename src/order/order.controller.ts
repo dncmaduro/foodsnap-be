@@ -14,6 +14,7 @@ import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@ne
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { UpdateShippingStatusDto } from './dto/update-order.dto';
 
 @ApiTags('order')
 @ApiBearerAuth()
@@ -58,5 +59,27 @@ export class OrderController {
   async assignOrder(@Param('id', ParseIntPipe) orderId: number, @Req() req) {
     const userId = req.user.user_id;
     return this.orderService.assignOrderToShipper(orderId, userId);
+  }
+
+  @Patch(':id/status')
+  @ApiOperation({ summary: 'Shipper cập nhật trạng thái đơn hàng' })
+  @ApiResponse({ status: 200, description: 'Cập nhật trạng thái thành công' })
+  @ApiResponse({ status: 400, description: 'Không hợp lệ hoặc không có quyền' })
+  async updateShippingStatus(
+    @Param('id', ParseIntPipe) orderId: number,
+    @Req() req,
+    @Body() dto: UpdateShippingStatusDto,
+  ) {
+    const userId = req.user.user_id;
+    return this.orderService.updateOrderShippingStatusByShipper(orderId, userId, dto);
+  }
+
+  @Patch(':id/cancel')
+  @ApiOperation({ summary: 'Người dùng huỷ đơn hàng nếu đang chờ xử lý' })
+  @ApiResponse({ status: 200, description: 'Đã huỷ đơn hàng' })
+  @ApiResponse({ status: 400, description: 'Không thể huỷ đơn hàng này' })
+  async cancelOrder(@Param('id', ParseIntPipe) orderId: number, @Req() req) {
+    const userId = req.user.user_id;
+    return this.orderService.cancelOrderByUser(orderId, userId);
   }
 }
