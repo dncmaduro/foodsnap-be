@@ -89,4 +89,79 @@ export class OrderService {
     if (error) throw new NotFoundException('Không tìm thấy đơn hàng');
     return data;
   }
+
+  async getPendingOrders(district?: string) {
+    const supabase = this.supabaseService.getClient();
+
+    const { data, error } = await supabase
+      .from('order')
+      .select(
+        `
+        *,
+        order_item (
+          *,
+          menuitem (
+            *,
+            restaurant (
+              *
+            )
+          )
+        )
+      `,
+      )
+      .eq('shipping_status', 'Pending');
+
+    if (error) throw new BadRequestException(error.message);
+
+    // Nếu có filter theo district
+    if (district) {
+      return data.filter((order) =>
+        order.order_item?.some((item) => item.menuitem?.restaurant?.district === district),
+      );
+    }
+
+    return data;
+  }
+
+  async assignOrderToShipper(orderId: number, userId: number) {
+    const supabase = this.supabaseService.getClient();
+
+    // 1. Kiểm tra shipper có tồn tại không
+    const { data: shipperInfo, error: shipperError } = await supabase
+      .from('shipper_info')
+      .select('user_id')
+      .eq('user_id', userId)
+      .single();
+
+    if (shipperError || !shipperInfo) {
+      throw new BadRequestException('Tài xế không tồn tại');
+    }
+
+    // 2. Kiểm tra tài xế có đang có đơn chưa hoàn thành không
+    const { data: existingOrder, error: existingError } = await supabase
+      .from('order')
+      .select('order_id')
+      .eq('shipper_id', userId)
+      .in('shipping_status', ['Assigned', 'In Transit'])
+      .maybeSingle();
+
+    if (existingError) throw new BadRequestException(existingError.message);
+    if (existingOrder) {
+      throw new BadRequestException('Bạn đang có đơn hàng chưa hoàn thành');
+    }
+
+    // 3. Gán đơn hàng cho shipper
+    const { error: updateError } = await supabase
+      .from('order')
+      .update({
+        shipper_id: userId,
+        shipping_status: 'Assigned',
+      })
+      .eq('order_id', orderId)
+      .eq('shipping_status', 'Pending'); // chỉ cho nhận nếu đang là Pending
+
+    if (updateError) throw new BadRequestException(updateError.message);
+
+    return { message: 'Nhận đơn hàng thành công' };
+  }
 }
