@@ -15,6 +15,7 @@ import { RestaurantApplicationModule } from './restaurant-application/restaurant
 import { ShipperApplicationModule } from './shipper-application/shipper-application.module';
 import { ShipperInfoModule } from './shipper/shipper.module';
 import { AdminApplicationModule } from './admin/admin.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { AdminApplicationModule } from './admin/admin.module';
     ShipperApplicationModule,
     ShipperInfoModule,
     AdminApplicationModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService, JwtStrategy],
