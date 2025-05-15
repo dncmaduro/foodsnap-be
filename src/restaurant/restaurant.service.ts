@@ -48,28 +48,40 @@ export class RestaurantService {
     };
   }
 
-  async updateInfo(userId: number, restaurantId: number, dto: UpdateRestaurantDto) {
+  async updateRestaurantInfo(
+    userId: number,
+    restaurantId: string,
+    dto: UpdateRestaurantDto,
+    file?: Express.Multer.File,
+  ): Promise<any> {
     const supabase = this.supabaseService.getClient();
 
     // 1. Kiểm tra nhà hàng có tồn tại và thuộc về user không
     const { data: restaurant, error: fetchError } = await supabase
       .from('restaurant')
-      .select('restaurant_id, user_id')
+      .select('restaurant_id, user_id, image_url')
       .eq('restaurant_id', restaurantId)
       .single();
 
     if (fetchError || !restaurant) {
       throw new NotFoundException('Không tìm thấy nhà hàng');
     }
-
     if (restaurant.user_id !== userId) {
       throw new BadRequestException('Bạn không có quyền sửa nhà hàng này');
     }
 
-    // 2. Tiến hành cập nhật
+    // 2. Nếu có file ảnh mới, upload và lấy url
+    let imageUrl = dto.image_url ?? restaurant.image_url;
+    if (file) {
+      imageUrl = await this.uploadService.uploadFile(file);
+    }
+
+    // 3. Tiến hành cập nhật thông tin
+    const updateData = { ...dto, image_url: imageUrl };
+
     const { error: updateError } = await supabase
       .from('restaurant')
-      .update(dto)
+      .update(updateData)
       .eq('restaurant_id', restaurantId);
 
     if (updateError) {
