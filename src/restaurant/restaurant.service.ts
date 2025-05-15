@@ -272,4 +272,14 @@ export class RestaurantService {
     }
     return { message: 'Xóa món ăn thành công' };
   }
+
+  async getRandomRestaurants(): Promise<any[]> {
+    const supabase = this.supabaseService.getClient();
+
+    const { data, error } = await supabase.rpc('random_restaurants', { limit_count: 6 });
+
+    if (error) throw new BadRequestException(error.message);
+
+    return data || [];
+  }
 }
