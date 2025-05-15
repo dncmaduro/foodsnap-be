@@ -43,6 +43,7 @@ export class ShipperApplicationService {
       phone: dto.phone,
       license_image_front: frontUrl,
       license_image_back: backUrl,
+      fullname: dto.fullname,
       status: 'pending',
       created_at: new Date().toISOString(),
     });

@@ -74,8 +74,8 @@ export class AdminApplicationService {
           user_id: app.user_id,
           fullname: app.fullname,
           phonenumber: app.phone,
-          license_front_image: app.license_front_image || app.id_card_front_url,
-          license_back_image: app.license_back_image || app.id_card_back_url,
+          license_front_image: app.license_image_front || app.id_card_front_url,
+          license_back_image: app.license_image_back || app.id_card_back_url,
           status: 'approved',
           created_at: new Date().toISOString(),
         });
