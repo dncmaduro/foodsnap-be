@@ -143,4 +143,11 @@ export class RestaurantController {
     const userId = req.user.user_id;
     return this.restaurantService.deleteMenuItem(userId, menuItemId);
   }
+
+  @Get('/greet/random')
+  @ApiOperation({ summary: 'Lấy 6 nhà hàng ngẫu nhiên' })
+  @ApiResponse({ status: 200, description: 'Danh sách nhà hàng ngẫu nhiên' })
+  async getRandomRestaurants() {
+    return this.restaurantService.getRandomRestaurants();
+  }
 }
