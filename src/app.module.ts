@@ -9,6 +9,7 @@ import { JwtStrategy } from './auth/strategies/jwt.strategy';
 import { RestaurantModule } from './restaurant/restaurant.module';
 import { CartModule } from './cart/cart.module';
 import { AddressModule } from './address/address.module';
+import { OrderModule } from './order/order.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { AddressModule } from './address/address.module';
     RestaurantModule,
     CartModule,
     AddressModule,
+    OrderModule,
   ],
   controllers: [AppController],
   providers: [AppService, JwtStrategy],
