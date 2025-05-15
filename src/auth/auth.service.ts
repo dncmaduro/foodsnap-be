@@ -112,8 +112,14 @@ export class AuthService {
         secret: process.env.JWT_SECRET || 'your-secret-key',
       });
 
+      const refresh_token = this.jwtService.sign(newPayload, {
+        expiresIn: '7d',
+        secret: process.env.JWT_REFRESH_SECRET || 'your-refresh-secret-key',
+      });
+
       return {
         access_token,
+        refresh_token,
       };
     } catch (error) {
       throw new UnauthorizedException('Refresh token không hợp lệ hoặc đã hết hạn');
