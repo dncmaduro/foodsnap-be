@@ -274,4 +274,33 @@ export class OrderService {
 
     return data;
   }
+
+  async getCurrentAssignedOrderByShipper(userId: number) {
+    const supabase = this.supabaseService.getClient();
+
+    // Tìm đơn hàng shipper đang nhận (Assigned hoặc In Transit)
+    const { data, error } = await supabase
+      .from('order')
+      .select(
+        `
+        *,
+        order_item (
+          *,
+          menuitem (
+            *,
+            restaurant (*)
+          )
+        )
+      `,
+      )
+      .eq('shipper_id', userId)
+      .in('shipping_status', ['Assigned', 'In Transit'])
+      .order('order_at', { ascending: false })
+      .maybeSingle();
+
+    if (error) throw new BadRequestException(error.message);
+
+    // Nếu không có đơn nào thì trả về null
+    return data;
+  }
 }

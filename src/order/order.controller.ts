@@ -90,4 +90,12 @@ export class OrderController {
     const userId = req.user.user_id;
     return this.orderService.getDeliveredOrdersByShipper(userId);
   }
+
+  @Get('/shipper/current')
+  @ApiOperation({ summary: 'Lấy đơn hàng mà shipper hiện tại đang nhận giao' })
+  @ApiResponse({ status: 200, description: 'Đơn hàng đang giao hoặc null nếu không có' })
+  async getCurrentOrderForShipper(@Req() req) {
+    const userId = req.user.user_id;
+    return this.orderService.getCurrentAssignedOrderByShipper(userId);
+  }
 }
