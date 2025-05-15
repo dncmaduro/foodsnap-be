@@ -82,4 +82,12 @@ export class OrderController {
     const userId = req.user.user_id;
     return this.orderService.cancelOrderByUser(orderId, userId);
   }
+
+  @Get('/history/delivered')
+  @ApiOperation({ summary: 'Lấy danh sách đơn hàng đã giao của shipper hiện tại' })
+  @ApiResponse({ status: 200, description: 'Danh sách đơn hàng đã giao' })
+  async getDeliveredByShipper(@Req() req) {
+    const userId = req.user.user_id;
+    return this.orderService.getDeliveredOrdersByShipper(userId);
+  }
 }

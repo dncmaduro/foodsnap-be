@@ -248,4 +248,30 @@ export class OrderService {
 
     return { message: 'Huỷ đơn hàng thành công' };
   }
+
+  async getDeliveredOrdersByShipper(userId: number) {
+    const supabase = this.supabaseService.getClient();
+
+    const { data, error } = await supabase
+      .from('order')
+      .select(
+        `
+        *,
+        order_item (
+          *,
+          menuitem (
+            *,
+            restaurant (*)
+          )
+        )
+      `,
+      )
+      .eq('shipper_id', userId)
+      .eq('shipping_status', 'Delivered')
+      .order('delivered_at', { ascending: false });
+
+    if (error) throw new BadRequestException(error.message);
+
+    return data;
+  }
 }
