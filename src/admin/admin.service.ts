@@ -127,7 +127,7 @@ export class AdminApplicationService {
           phone: app.phone,
           description: app.description,
           image_url: app.image_url,
-          created_at: new Date().toISOString(),
+          approved_at: new Date().toISOString(),
         });
         if (createErr) throw new BadRequestException(createErr.message);
       }
