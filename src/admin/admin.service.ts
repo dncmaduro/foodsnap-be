@@ -76,7 +76,7 @@ export class AdminApplicationService {
           phonenumber: app.phone,
           license_front_image: app.license_front_image || app.id_card_front_url,
           license_back_image: app.license_back_image || app.id_card_back_url,
-          status: 'active',
+          status: 'approved',
           created_at: new Date().toISOString(),
         });
         if (createErr) throw new BadRequestException(createErr.message);
