@@ -84,7 +84,7 @@ export class OrderService {
       .from('order')
       .select('*, order_item(*, menuitem(*, restaurant(*)))')
       .eq('order_id', orderId)
-      .eq('user_id', userId)
+      .or(`user_id.eq.${userId},shipper_id.eq.${userId}`)
       .single();
 
     if (error) throw new NotFoundException('Không tìm thấy đơn hàng');
